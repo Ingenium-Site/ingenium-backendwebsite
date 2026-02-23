@@ -1,0 +1,42 @@
+{
+  "name": "ingenium-backendwebsite",
+  "version": "1.0.0",
+  "description": "Backend for ingenium websites, this will handle all the conatact services and other relevant backend services",
+  "keywords": [
+    "express",
+    "backend",
+    "js"
+  ],
+  "homepage": "https://github.com/Ingenium-Site/ingenium-backendwebsite#readme",
+  "bugs": {
+    "url": "https://github.com/Ingenium-Site/ingenium-backendwebsite/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ingenium-Site/ingenium-backendwebsite.git"
+  },
+  "license": "ISC",
+  "author": "Ezekiel Donkor",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "html-escape": "^2.0.0",
+    "joi": "^18.0.2",
+    "mongoose": "^9.2.1",
+    "nodemailer": "^8.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
