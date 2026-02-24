@@ -16,6 +16,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Ingenium Backend is running!");
+});
+
 // Routes
 app.use("/api/contact", contactRoutes);
 
