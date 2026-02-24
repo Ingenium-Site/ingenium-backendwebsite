@@ -1,19 +1,16 @@
 import express from "express";
 import { contactValidationSchema } from "../validations/contact.validation.js";
-import { submitContactForm } from "../controllers/contact.controller.js";
-import {validateRequest} from "../middleware/validate.js";
+import { validateRequest } from "../middleware/validate.js";
 import { contactRateLimiter } from "../middleware/rateLimiter.js";
+import { submitContactForm } from "../controllers/contact.controller.js";
 
 const router = express.Router();
 
-router.post("/", 
-    contactRateLimiter, 
-    validateRequest(contactValidationSchema), 
-    submitContactForm
+router.post(
+  "/",
+  contactRateLimiter,
+  validateRequest(contactValidationSchema),
+  submitContactForm
 );
-
-// router.post("/", (req, res) => {
-//   res.json({ message: "Route working" });
-// });
 
 export default router;

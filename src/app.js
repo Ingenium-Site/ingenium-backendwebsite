@@ -1,12 +1,9 @@
-import dotenv from "dotenv";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import contactRoutes from "./routes/contact.routes.js";
 
 const app = express();
-
-dotenv.config();
 
 // Middlewares
 app.use(helmet());
@@ -17,7 +14,7 @@ app.use(cors({
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Ingenium Backend is running!");
+  res.send("Ingenium Backend is running very well!");
 });
 
 // Routes

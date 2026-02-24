@@ -1,11 +1,11 @@
 # Ingenium Backend Website
 
-A secure, scalable Node.js backend service for the Ingenium website. Handles contact form submissions with email notifications, reCAPTCHA verification, rate limiting, and comprehensive error handling.
+A secure, scalable Node.js backend service for the Ingenium website. Handles contact form submissions with email notifications, rate limiting, and comprehensive error handling.
 
 ## Features
 
 - ✅ **Contact Form API** - Receive and process contact form submissions
-- 🔒 **reCAPTCHA Integration** - Spam protection using Google reCAPTCHA
+- 🔒 **Spam protection** handled via rate limiting and validation (reCAPTCHA removed)
 - 📧 **Email Notifications** - SMTP-based email notifications to admin and users
 - ⏱️ **Rate Limiting** - Prevent abuse with intelligent rate limiting
 - 🛡️ **Security Best Practices** - Helmet, CORS configuration, HTML escaping, secure error handling
@@ -19,7 +19,7 @@ A secure, scalable Node.js backend service for the Ingenium website. Handles con
 - npm or yarn
 - MongoDB (local or cloud instance)
 - SMTP credentials (for email sending)
-- Google reCAPTCHA API keys
+- (no special API keys required)
 
 ## Installation
 
@@ -41,18 +41,18 @@ A secure, scalable Node.js backend service for the Ingenium website. Handles con
 
 ## Configuration
 
-This project requires a `.env` file with sensitive configuration values (database URI, SMTP credentials, reCAPTCHA secret, etc.). For security reasons the README does not include environment variable values.
+This project requires a `.env` file with sensitive configuration values (database URI, SMTP credentials, etc.). For security reasons the README does not include environment variable values.
 
 - Create a `.env` in the project root and populate it with the variables your deployment requires.
 - Do not commit `.env` to source control. Keep secrets in a secure store (Vault, GitHub Secrets, AWS Secrets Manager, etc.).
 - If your team uses a template, provide a `.env.example` with placeholder names only (no real secrets).
 
-If you need to find the exact variable names used by the application, check the source files (for example `src/database/connection.js`, `src/services/email.services.js`, and `src/controllers/contact.controller.js`).
+If you need to find the exact variable names used by the application, check the source files (for example `src/database/connection.js`, `src/services/email.services.js`, and `src/controllers/contact.controller.js`). This code no longer uses any reCAPTCHA-related variables.
 
 Recommended checklist for configuration:
 
 - Use TLS for SMTP (verify `SMTP_PORT` and `secure` settings with your provider).
-- Ensure `RECAPTCHA_SECRET_KEY` (or the name used in your config) is set and not exposed in URLs or logs.
+- Ensure configuration values are set and not exposed in URLs or logs.
 - Set `CLIENT_URL` to your frontend origin to restrict CORS.
 - Use `NODE_ENV=production` in production to enable appropriate logging and security behavior.
 
@@ -60,30 +60,23 @@ Recommended checklist for configuration:
 
 ```
 src/
-├── app.js                      # Express app configuration
-├── server.js                   # Server entry point
-├── config/                     # Configuration files
-│   ├── db.js                  # Database configuration
-│   ├── email.js               # Email configuration
-│   └── recapture.js           # reCAPTCHA configuration
-├── controllers/               # Route handlers
+├── app.js
+├── server.js
+├── controllers/
 │   └── contact.controller.js
-├── database/                  # Database setup
+├── database/
 │   └── connection.js
-├── middleware/                # Custom middleware
-│   ├── errorHandler.js
+├── middleware/
 │   ├── rateLimiter.js
 │   └── validate.js
-├── models/                    # MongoDB schemas
+├── models/
 │   └── contact.model.js
-├── routes/                    # API routes
+├── routes/
 │   └── contact.routes.js
-├── services/                  # Business logic
+├── services/
 │   ├── contact.services.js
 │   └── email.services.js
-├── utils/                     # Utility functions
-│   └── logger.js
-└── validations/               # Validation schemas
+└── validations/
     └── contact.validation.js
 ```
 
@@ -93,7 +86,7 @@ src/
 
 **POST** `/api/contact`
 
-Submit a contact form with reCAPTCHA verification.
+Submit a contact form.
 
 #### Request Body
 ```json
@@ -101,8 +94,7 @@ Submit a contact form with reCAPTCHA verification.
   "name": "John Doe",
   "email": "john@example.com",
   "company": "Acme Corp",
-  "message": "I'm interested in learning more about your services.",
-  "token": "recaptcha-token-from-client"
+  "message": "I'm interested in learning more about your services."
 }
 ```
 
@@ -123,6 +115,10 @@ Submit a contact form with reCAPTCHA verification.
 }
 ```
 
+If the contact record is saved but email delivery fails, the API still returns `201` with:
+- `message`: `"Message saved, but email delivery failed"`
+- `emailWarnings`: available in non-production environments only
+
 #### Response (Error)
 ```json
 {
@@ -137,7 +133,7 @@ Submit a contact form with reCAPTCHA verification.
 - **Helmet**: HTTP headers security middleware
 - **Rate Limiting**: Max 5 requests per IP per 10 minutes
 - **Input Validation**: Schema validation with Joi
-- **reCAPTCHA**: Server-side token verification
+- (removed reCAPTCHA integration)
 - **Secure Error Handling**: No sensitive data leakage in responses
 - **Environment Variables**: Secure credential management
 
@@ -158,7 +154,7 @@ npm start
 
 The application includes comprehensive error handling:
 
-- **400** - Validation errors, spam detection
+- **400** - Validation errors
 - **500** - Server errors (generic message sent to client, full error logged server-side)
 
 ## Contributing
