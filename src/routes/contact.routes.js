@@ -9,6 +9,11 @@ const router = express.Router();
 router.post("/", 
     contactRateLimiter, 
     validateRequest(contactValidationSchema), 
-    submitContactForm);
+    submitContactForm
+);
+
+// router.post("/", (req, res) => {
+//   res.json({ message: "Route working" });
+// });
 
 export default router;

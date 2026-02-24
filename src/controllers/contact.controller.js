@@ -4,14 +4,22 @@ import axios from "axios";
 /**
  * Verify reCAPTCHA token
  */
+
 const verifyRecaptcha = async (token, secret, ip) => {
   const url = "https://www.google.com/recaptcha/api/siteverify";
-  const response = await axios.post(url, {
-    secret,
-    response: token,
-    remoteip: ip
+
+  const params = new URLSearchParams();
+  params.append("secret", secret);
+  params.append("response", token);
+  params.append("remoteip", ip);
+
+  const response = await axios.post(url, params, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
   });
-  return response.data.success;
+
+  return response.data;
 };
 
 export const submitContactForm = async (req, res) => {
@@ -19,14 +27,20 @@ export const submitContactForm = async (req, res) => {
     const { name, email, message, token } = req.body;
     const ip = req.ip;
 
+    if (!token) {
+      return res.status(400).json({ error: "reCAPTCHA token is required" });
+    }
+
     // Verify reCAPTCHA with proper error handling
-    const secret = process.env.RECAPTCHA_SECRET;
+    const secret = process.env.RECAPTURE_SECRET_KEY;
     if (!secret) {
       return res.status(500).json({ error: "Configuration error" });
     }
     
     const isHuman = await verifyRecaptcha(token, secret, ip);
-    if (!isHuman) return res.status(400).json({ error: "Spam detected" });
+    console.log("reCAPTCHA verification result:", isHuman);
+
+    if (!isHuman.success) return res.status(400).json({ error: "Spam detected", details: isHuman["error-codes"] });
 
     const contact = await handleContactForm({ name, email, message }, ip);
 
