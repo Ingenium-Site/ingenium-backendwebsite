@@ -32,6 +32,12 @@ const openapiDocument = YAML.parse(fs.readFileSync(openapiPath, "utf8"));
 app.get("/api/docs/openapi.yaml", (req, res) => {
   res.type("text/yaml").send(fs.readFileSync(openapiPath, "utf8"));
 });
+app.use("/api/docs", (req, res, next) => {
+  // Swagger UI uses inline scripts/styles that Helmet's CSP can block.
+  res.removeHeader("Content-Security-Policy");
+  res.removeHeader("Content-Security-Policy-Report-Only");
+  next();
+});
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 // Routes
