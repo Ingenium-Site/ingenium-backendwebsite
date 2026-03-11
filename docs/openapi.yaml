@@ -1,0 +1,294 @@
+openapi: 3.0.3
+info:
+  title: Ingenium Backend API
+  version: 1.0.0
+  description: |
+    OpenAPI documentation for the Ingenium backend.
+    Use this to test the API and integrate the frontend.
+servers:
+  - url: http://localhost:5001
+    description: Local development
+paths:
+  /:
+    get:
+      summary: Health check
+      description: Returns a simple message to confirm the API is running.
+      responses:
+        '200':
+          description: API is running
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Ingenium Backend is running very well!
+  /api/contact:
+    post:
+      summary: Submit contact form
+      description: Creates a contact message and sends notification emails.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+            examples:
+              example:
+                value:
+                  name: John Doe
+                  email: john@example.com
+                  company: Acme Corp
+                  message: I'm interested in learning more about your services.
+      responses:
+        '201':
+          description: Contact message saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    message: Message sent
+                    contact:
+                      _id: 60d5ec49c1234567890abcde
+                      name: John Doe
+                      email: john@example.com
+                      company: Acme Corp
+                      message: I'm interested in learning more about your services.
+                      ipAddress: 192.168.1.1
+                      createdAt: 2025-02-23T10:30:00.000Z
+                      updatedAt: 2025-02-23T10:30:00.000Z
+                emailWarning:
+                  value:
+                    success: true
+                    message: Message saved, but email delivery failed
+                    contact:
+                      _id: 60d5ec49c1234567890abcde
+                      name: John Doe
+                      email: john@example.com
+                      company: Acme Corp
+                      message: I'm interested in learning more about your services.
+                      ipAddress: 192.168.1.1
+                      createdAt: 2025-02-23T10:30:00.000Z
+                      updatedAt: 2025-02-23T10:30:00.000Z
+                    emailWarnings:
+                      - SMTP connection failed
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "\"email\" must be a valid email"
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Too many requests from this IP, please try again later.
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Failed to process request
+  /api/request-service:
+    post:
+      summary: Submit service request
+      description: Creates a service request and sends notification emails.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestServiceRequest'
+            examples:
+              example:
+                value:
+                  fullName: Jane Smith
+                  email: jane@example.com
+                  serviceType: Web development
+      responses:
+        '201':
+          description: Service request saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestServiceResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    message: Request received
+                    requestService:
+                      _id: 60d5ec49c1234567890abce0
+                      fullName: Jane Smith
+                      email: jane@example.com
+                      serviceType: Web development
+                      ipAddress: 192.168.1.1
+                      createdAt: 2025-02-23T10:30:00.000Z
+                      updatedAt: 2025-02-23T10:30:00.000Z
+                emailWarning:
+                  value:
+                    success: true
+                    message: Request saved, but email delivery failed
+                    requestService:
+                      _id: 60d5ec49c1234567890abce0
+                      fullName: Jane Smith
+                      email: jane@example.com
+                      serviceType: Web development
+                      ipAddress: 192.168.1.1
+                      createdAt: 2025-02-23T10:30:00.000Z
+                      updatedAt: 2025-02-23T10:30:00.000Z
+                    emailWarnings:
+                      - SMTP connection failed
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "\"fullName\" is required"
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Too many requests from this IP, please try again later.
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Failed to process request
+components:
+  schemas:
+    ContactRequest:
+      type: object
+      required:
+        - name
+        - email
+        - message
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+          maxLength: 100
+          nullable: true
+        message:
+          type: string
+          minLength: 10
+          maxLength: 1000
+    Contact:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+          nullable: true
+        message:
+          type: string
+        ipAddress:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ContactResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        contact:
+          $ref: '#/components/schemas/Contact'
+        emailWarnings:
+          type: array
+          description: Present only in non-production environments when email sending fails.
+          items:
+            type: string
+    RequestServiceRequest:
+      type: object
+      required:
+        - fullName
+        - email
+        - serviceType
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        serviceType:
+          type: string
+          maxLength: 100
+    RequestService:
+      type: object
+      properties:
+        _id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        serviceType:
+          type: string
+        ipAddress:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    RequestServiceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        requestService:
+          $ref: '#/components/schemas/RequestService'
+        emailWarnings:
+          type: array
+          description: Present only in non-production environments when email sending fails.
+          items:
+            type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: string
+          description: Present only in non-production environments for server errors.

@@ -1,6 +1,11 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import YAML from "yaml";
+import swaggerUi from "swagger-ui-express";
 import contactRoutes from "./routes/contact.routes.js";
 import requestServiceRoutes from "./routes/requestService.routes.js";
 
@@ -17,6 +22,17 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Ingenium Backend is running very well!");
 });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const openapiPath = path.join(__dirname, "../docs/openapi.yaml");
+const openapiDocument = YAML.parse(fs.readFileSync(openapiPath, "utf8"));
+
+// API docs
+app.get("/api/docs/openapi.yaml", (req, res) => {
+  res.type("text/yaml").send(fs.readFileSync(openapiPath, "utf8"));
+});
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 // Routes
 app.use("/api/contact", contactRoutes);

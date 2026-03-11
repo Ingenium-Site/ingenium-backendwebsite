@@ -5,6 +5,7 @@ A secure, scalable Node.js backend service for the Ingenium website. Handles con
 ## Features
 
 - ✅ **Contact Form API** - Receive and process contact form submissions
+- ✅ **Service Request API** - Receive and process service request submissions
 - 🔒 **Spam protection** handled via rate limiting and validation (reCAPTCHA removed)
 - 📧 **Email Notifications** - SMTP-based email notifications to admin and users
 - ⏱️ **Rate Limiting** - Prevent abuse with intelligent rate limiting
@@ -63,22 +64,34 @@ src/
 ├── app.js
 ├── server.js
 ├── controllers/
-│   └── contact.controller.js
+│   ├── contact.controller.js
+│   └── requestService.controller.js
 ├── database/
 │   └── connection.js
 ├── middleware/
 │   ├── rateLimiter.js
 │   └── validate.js
 ├── models/
-│   └── contact.model.js
+│   ├── contact.model.js
+│   └── requestService.js
 ├── routes/
-│   └── contact.routes.js
+│   ├── contact.routes.js
+│   └── requestService.routes.js
 ├── services/
 │   ├── contact.services.js
-│   └── email.services.js
+│   ├── email.services.js
+│   └── requestService.services.js
 └── validations/
-    └── contact.validation.js
+    ├── contact.validation.js
+    └── requestService.validation.js
 ```
+
+## API Docs (Swagger/OpenAPI)
+
+Interactive Swagger UI and the raw OpenAPI spec are available when the server is running:
+
+- `GET /api/docs` - Swagger UI
+- `GET /api/docs/openapi.yaml` - OpenAPI specification
 
 ## API Endpoints
 
@@ -117,6 +130,48 @@ Submit a contact form.
 
 If the contact record is saved but email delivery fails, the API still returns `201` with:
 - `message`: `"Message saved, but email delivery failed"`
+- `emailWarnings`: available in non-production environments only
+
+#### Response (Error)
+```json
+{
+  "error": "Validation error or server error message"
+}
+```
+
+### Submit Service Request
+
+**POST** `/api/request-service`
+
+Submit a service request.
+
+#### Request Body
+```json
+{
+  "fullName": "Jane Smith",
+  "email": "jane@example.com",
+  "serviceType": "Web development"
+}
+```
+
+#### Response (Success)
+```json
+{
+  "success": true,
+  "message": "Request received",
+  "requestService": {
+    "_id": "60d5ec49c1234567890abce0",
+    "fullName": "Jane Smith",
+    "email": "jane@example.com",
+    "serviceType": "Web development",
+    "ipAddress": "192.168.1.1",
+    "createdAt": "2025-02-23T10:30:00.000Z"
+  }
+}
+```
+
+If the record is saved but email delivery fails, the API still returns `201` with:
+- `message`: `"Request saved, but email delivery failed"`
 - `emailWarnings`: available in non-production environments only
 
 #### Response (Error)
