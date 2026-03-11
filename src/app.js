@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import contactRoutes from "./routes/contact.routes.js";
+import requestServiceRoutes from "./routes/requestService.routes.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/contact", contactRoutes);
+app.use("/api/request-service", requestServiceRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
